@@ -33,10 +33,10 @@ module tt_um_example (
 
   // Assign outputs
   assign uo_out  = range_out;           // range goes to dedicated outputs
-  assign uio_out = {7'b0, error_out};   // error on uio_out[0], rest are 0
-  assign uio_oe  = 8'b00000001;         // uio[0] is output (error), uio[1:7] are inputs
+  assign uio_out = {5'b0, error_out, 2'b0};   // error on uio_out[2], rest are 0
+  assign uio_oe  = 8'b00000100;         // uio[2] is output (error), uio[0:1] are inputs (go, finish)
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, uio_in[7:2], 1'b0};
+  wire _unused = &{ena, uio_in[7:3], 1'b0};
 
 endmodule
