@@ -16,12 +16,27 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  // Internal signals for RangeFinder
+  wire [7:0] range_out;
+  wire       error_out;
+
+  // Instantiate RangeFinder module (WIDTH=8)
+  RangeFinder #(.WIDTH(8)) range_finder_inst (
+    .data_in (ui_in),           // 8-bit data input from dedicated inputs
+    .clock   (clk),             // clock
+    .reset   (~rst_n),          // reset (active high, so invert rst_n)
+    .go      (uio_in[0]),       // go signal from bidirectional pin 0
+    .finish  (uio_in[1]),       // finish signal from bidirectional pin 1
+    .range   (range_out),       // 8-bit range output
+    .error   (error_out)        // error output
+  );
+
+  // Assign outputs
+  assign uo_out  = range_out;           // range goes to dedicated outputs
+  assign uio_out = {7'b0, error_out};   // error on uio_out[0], rest are 0
+  assign uio_oe  = 8'b00000001;         // uio[0] is output (error), uio[1:7] are inputs
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, uio_in[7:2], 1'b0};
 
 endmodule
