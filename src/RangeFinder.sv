@@ -16,6 +16,7 @@ module RangeFinder
   state_t state;
 
   logic [WIDTH-1:0] low_q, high_q;
+  logic [WIDTH-1:0] new_min, new_max;
 
   always_ff @(posedge clock or posedge reset) begin
     if (reset) begin
@@ -49,7 +50,6 @@ module RangeFinder
             error <= 1'b1;
           end
           else begin
-            logic [WIDTH-1:0] new_min, new_max;
             new_min = (data_in < low_q) ? data_in : low_q;
             new_max = (data_in > high_q) ? data_in : high_q;
             low_q <= new_min;
